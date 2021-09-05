@@ -45,10 +45,10 @@ static _SecTaskCopySigningIdentifierType *_SecTaskCopySigningIdentifier = nil;
 
 static CFTypeRef (*original_SecTaskCopyValueForEntitlement)(void *task, CFStringRef entitlement, CFErrorRef _Nullable *error);
 static CFTypeRef replaced_SecTaskCopyValueForEntitlement(void *task, CFStringRef entitlement, CFErrorRef _Nullable *error) {
-	DLog(@"Looking for entitlement: %@", (__bridge NSString *)entitlement);
+    DLog(@"Signing Identifier: %@", (__bridge NSString *)_SecTaskCopySigningIdentifier(task, NULL));
+    DLog(@"Value for entitlement: %@", (__bridge NSString *)entitlement);
 
-    CFStringRef signing_identifier = _SecTaskCopySigningIdentifier(task, NULL);
-    if (CFArrayContainsValue(_web_entitlements, CFRangeMake(0, CFArrayGetCount(_web_entitlements)), signing_identifier)) {
+    if (CFArrayContainsValue(_web_entitlements, CFRangeMake(0, CFArrayGetCount(_web_entitlements)), entitlement)) {
         return kCFBooleanTrue;
     }
 
@@ -59,11 +59,11 @@ static CFTypeRef replaced_SecTaskCopyValueForEntitlement(void *task, CFStringRef
 
 %ctor {
 	@autoreleasepool {
-        DLog(@"Enabled");
+        DLog(@"Running");
 
         // Setup globals
         _web_entitlements = _needed_entitlements();
-        DLog(@"Entitlements size: %li", CFArrayGetCount(_web_entitlements));
+        DLog(@"Entitlements size: %li (%p)", CFArrayGetCount(_web_entitlements), _web_entitlements);
 
         // Load Security
         void *security_handle = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_NOW);
