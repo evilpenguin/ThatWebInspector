@@ -1,0 +1,9 @@
+Package: com.evilpenguin.thatwebinspector
+Name: ThatWebInspector
+Depends: mobilesubstrate
+Version: 1.0
+Architecture: iphoneos-arm
+Description: ThatWebInspector enables web inspecting
+Maintainer: EvilPenguin
+Author: EvilPenguin
+Section: Tweaks
