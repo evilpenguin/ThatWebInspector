@@ -8,9 +8,10 @@
 #include <Security/Security.h>
 #include <dlfcn.h>
 #include <substrate.h>
+#include <syslog.h>
 
 #ifdef DEBUG
-    #define DLog(FORMAT, ...) fprintf(stderr, "+[ThatWebInspector] %s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+    #define DLog(FORMAT, ...) syslog(LOG_ERR, "+[XPCSniffer] %s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 #else 
     #define DLog(...) (void)0
 #endif
@@ -66,16 +67,16 @@ static CFTypeRef replaced_SecTaskCopyValueForEntitlement(void *task, CFStringRef
         DLog(@"Entitlements size: %li (%p)", CFArrayGetCount(_web_entitlements), _web_entitlements);
 
         // Load Security
-        void *security_handle = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_NOW);
+        MSImageRef security_handle = MSGetImageByName("/System/Library/Frameworks/Security.framework/Security");
         DLog(@"Security: %p", security_handle);
 
         if (security_handle) {
             // _SecTaskCopySigningIdentifier
-            _SecTaskCopySigningIdentifier = (_SecTaskCopySigningIdentifierType *)dlsym(security_handle, "_SecTaskCopySigningIdentifier");
+            _SecTaskCopySigningIdentifier = (_SecTaskCopySigningIdentifierType *)MSFindSymbol(security_handle, "_SecTaskCopySigningIdentifier");
             DLog(@"_SecTaskCopySigningIdentifier: %p", _SecTaskCopySigningIdentifier);
 
             // _SecTaskCopyValueForEntitlement
-            void *_SecTaskCopyValueForEntitlement = dlsym(security_handle, "_SecTaskCopyValueForEntitlement");
+            void *_SecTaskCopyValueForEntitlement = MSFindSymbol(security_handle, "_SecTaskCopyValueForEntitlement");
             DLog(@"_SecTaskCopyValueForEntitlement: %p", _SecTaskCopyValueForEntitlement);
 
             if (_SecTaskCopyValueForEntitlement) {
