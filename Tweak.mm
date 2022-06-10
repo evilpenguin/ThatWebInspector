@@ -11,7 +11,7 @@
 #include <syslog.h>
 
 #ifdef DEBUG
-    #define DLog(FORMAT, ...) syslog(LOG_ERR, "+[XPCSniffer] %s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+    #define DLog(FORMAT, ...) syslog(LOG_ERR, "+[ThatWebInspector] %s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 #else 
     #define DLog(...) (void)0
 #endif
